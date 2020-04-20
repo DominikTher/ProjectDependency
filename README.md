@@ -8,7 +8,7 @@ This is just for my personal purposes and it's very simple. Tested only on a few
 - [x] Export JSON with dependencies between projects
 - [x] .NET Core applications only
 
-## Example of outpus
+## Example of outputs
 ### Final diagram
 ![Dependency diagram](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.png)
 

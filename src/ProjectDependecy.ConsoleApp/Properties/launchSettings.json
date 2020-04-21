@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ProjectDependecy.ConsoleApp": {
-      "commandName": "Project",
-      "commandLineArgs": "D:\\source\\repos\\Workout\\Workout.sln"
-    }
-  }
-}

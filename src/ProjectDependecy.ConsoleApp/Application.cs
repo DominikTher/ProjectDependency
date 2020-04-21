@@ -1,5 +1,6 @@
 ﻿using Microsoft.Build.Construction;
 using ProjectDependecy.ConsoleApp.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace ProjectDependecy.ConsoleApp
     {
         private readonly IProjectStructureService projectStructureService;
         private readonly IGeneratorService generatorService;
+        private IEnumerable<ProjectInSolution> rootProjects;
+        private SolutionFile solutionFile;
 
         public Application(IProjectStructureService projectStructureService, IGeneratorService generatorService)
         {
@@ -20,12 +23,47 @@ namespace ProjectDependecy.ConsoleApp
 
         public void Start(string solutionFilePtah)
         {
-            var solutionFile = SolutionFile.Parse(solutionFilePtah);
-            var projects = solutionFile.ProjectsInOrder.Where(project => project.ProjectType == SolutionProjectType.KnownToBeMSBuildFormat);
-            AddProjectDependecies(projects);
-            BuildProjectDependencies();
+            solutionFile = SolutionFile.Parse(solutionFilePtah);
+            var projects = solutionFile.ProjectsInOrder;
 
-            generatorService.Save(projectStructureService.GetStrucutre());
+            var root = new Composite("root");
+            rootProjects = GetProjectsInSolution(null);
+            BuildTree(rootProjects, root);
+
+
+            //root.Operation();
+
+            var client = new Client();
+            client.ClientCode(root);
+
+            //BuildProjectDependencies();
+
+            //generatorService.Save(projectStructureService.GetStrucutre());
+        }
+
+        private void BuildTree(IEnumerable<ProjectInSolution> projectsInSolution, Composite parentComposite)
+        {
+            foreach (var projectChild in projectsInSolution)
+            {
+                if (projectChild.ProjectType == SolutionProjectType.SolutionFolder)
+                {
+                    var currentComposite = new Composite(projectChild.ProjectName);
+                    parentComposite.Add(currentComposite);
+
+                    BuildTree(GetProjectsInSolution(projectChild.ProjectGuid), currentComposite);
+                }
+                else
+                {
+                    var leaf = new Leaf(projectChild.ProjectName);
+                    parentComposite.Add(leaf);
+                    AddProjectDependecies(leaf, projectChild);
+                }
+            }
+        }
+
+        private IEnumerable<ProjectInSolution> GetProjectsInSolution(string parentGuid)
+        {
+            return solutionFile.ProjectsInOrder.Where(project => project.ParentProjectGuid == parentGuid);
         }
 
         private void BuildProjectDependencies()
@@ -41,17 +79,14 @@ namespace ProjectDependecy.ConsoleApp
             }
         }
 
-        private void AddProjectDependecies(IEnumerable<ProjectInSolution> projects)
+        private void AddProjectDependecies(Leaf leaf, ProjectInSolution project)
         {
-            foreach (var project in projects)
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(project.AbsolutePath);
+
+            foreach (XmlElement projectReference in xmlDoc.GetElementsByTagName("ProjectReference"))
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(project.AbsolutePath);
-                projectStructureService.AddProject(project.ProjectName);
-                foreach (XmlElement projectReference in xmlDoc.GetElementsByTagName("ProjectReference"))
-                {
-                    projectStructureService.AddDependency(project.ProjectName, Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include")));
-                }
+                leaf.AddDependency(Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include")));
             }
         }
     }

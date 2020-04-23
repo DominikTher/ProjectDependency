@@ -10,7 +10,7 @@ namespace ProjectDependecy.ConsoleApp
             using var serviceProvider = BuilServiceProvider();
             var application = serviceProvider.GetRequiredService<Application>();
 
-            var solutionFilePath = args[0];
+            var solutionFilePath = @"D:\source\repos\TestSolution\TestSolution.sln";// args[0];
             application.Start(solutionFilePath);
         }
 

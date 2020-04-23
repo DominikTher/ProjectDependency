@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Xml;
 
 namespace ProjectDependecy.ConsoleApp.Services
@@ -19,13 +18,21 @@ namespace ProjectDependecy.ConsoleApp.Services
 
         public void Save(Dictionary<string, List<string>> projectStructure)
         {
+            foreach (var item in projectStructure)
+            {
+                BuildProject(item.Key, item.Key);
+                foreach (var dep in item.Value)
+                {
+                    BuildDependency(item.Key, dep);
+                }
+            }
+
             SaveToXml();
-            SaveToJson(projectStructure);
         }
 
-        public void BuildProject(string name)
+        public void BuildProject(string id, string name)
         {
-            var mxCell = BuildMxCell(name, name, "rounded=0;whiteSpace=wrap;html=1;");
+            var mxCell = BuildMxCell(id, name, "rounded=0;whiteSpace=wrap;html=1;");
             mxCell.SetAttribute("vertex", "1");
             mxCell.SetAttribute("parent", "1");
 
@@ -70,17 +77,6 @@ namespace ProjectDependecy.ConsoleApp.Services
             mxGeometry.SetAttribute("as", "geometry");
 
             return mxGeometry;
-        }
-
-        private static void SaveToJson(Dictionary<string, List<string>> projectStructure)
-        {
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-            };
-
-            var jsonString = JsonSerializer.Serialize(projectStructure, jsonSerializerOptions);
-            File.WriteAllText($"dependencyDiagram-{DateTime.Now:dd-MM-yyyy-HH,mm,ss}.json", jsonString);
         }
 
         private void SaveToXml()

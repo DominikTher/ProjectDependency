@@ -1,6 +1,7 @@
 ﻿using Microsoft.Build.Construction;
 using ProjectDependecy.ConsoleApp.Composite;
 using ProjectDependecy.ConsoleApp.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,8 +36,15 @@ namespace ProjectDependecy.ConsoleApp
 
             // Demo
             var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.WriteIndented = true;
             jsonSerializerOptions.Converters.Add(new SolutionProjectCompositeConverter());
             var jsonString = JsonSerializer.Serialize(root, jsonSerializerOptions);
+            File.WriteAllText($"dependencyDiagram-{DateTime.Now:dd-MM-yyyy-HH,mm,ss}.json", jsonString);
+
+            // TODO refactor
+            generatorService.Save(projectStructureService.GetStrucutre());
+
+            // TODO separate xml generator + separate json generator
         }
 
         private string GetPathForProject(string guid, string projectName)
@@ -61,8 +69,9 @@ namespace ProjectDependecy.ConsoleApp
                 }
                 else
                 {
-                    var leaf = new SolutionProject(projectChild.ProjectName);
+                    var leaf = new SolutionProject(projectChild.ProjectName);  
                     parentComposite.Add(leaf);
+                    projectStructureService.AddProject(leaf.Name);
                     AddProjectDependecies(leaf, projectChild);
                 }
             }
@@ -80,7 +89,9 @@ namespace ProjectDependecy.ConsoleApp
 
             foreach (XmlElement projectReference in xmlDoc.GetElementsByTagName("ProjectReference"))
             {
-                leaf.Dependencies.Add(Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include")));
+                var dependency = Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include"));
+                leaf.Dependencies.Add(dependency);
+                projectStructureService.AddDependency(leaf.Name, dependency);
             }
         }
     }

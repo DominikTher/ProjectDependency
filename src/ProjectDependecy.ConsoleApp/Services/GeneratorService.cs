@@ -20,12 +20,12 @@ namespace ProjectDependecy.ConsoleApp.Services
         public void Save(Dictionary<string, List<string>> projectStructure)
         {
             SaveToXml();
-            SaveToJson(projectStructure);
+            //SaveToJson(projectStructure);
         }
 
-        public void BuildProject(string name)
+        public void BuildProject(string id, string name)
         {
-            var mxCell = BuildMxCell(name, name, "rounded=0;whiteSpace=wrap;html=1;");
+            var mxCell = BuildMxCell(id, name, "rounded=0;whiteSpace=wrap;html=1;");
             mxCell.SetAttribute("vertex", "1");
             mxCell.SetAttribute("parent", "1");
 

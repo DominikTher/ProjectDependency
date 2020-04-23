@@ -1,9 +1,10 @@
 ﻿using Microsoft.Build.Construction;
+using ProjectDependecy.ConsoleApp.Composite;
 using ProjectDependecy.ConsoleApp.Services;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Xml;
 
 namespace ProjectDependecy.ConsoleApp
@@ -24,37 +25,43 @@ namespace ProjectDependecy.ConsoleApp
         public void Start(string solutionFilePtah)
         {
             solutionFile = SolutionFile.Parse(solutionFilePtah);
-            var projects = solutionFile.ProjectsInOrder;
 
-            var root = new Composite("root");
+            // Demo
+            var projectPath = GetPathForProject("{018DF148-8688-4384-8177-A214562C52B9}", string.Empty);
+
+            var root = new SolutionFolder();
             rootProjects = GetProjectsInSolution(null);
             BuildTree(rootProjects, root);
 
-
-            //root.Operation();
-
-            var client = new Client();
-            client.ClientCode(root);
-
-            //BuildProjectDependencies();
-
-            //generatorService.Save(projectStructureService.GetStrucutre());
+            // Demo
+            var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Converters.Add(new SolutionProjectCompositeConverter());
+            var jsonString = JsonSerializer.Serialize(root, jsonSerializerOptions);
         }
 
-        private void BuildTree(IEnumerable<ProjectInSolution> projectsInSolution, Composite parentComposite)
+        private string GetPathForProject(string guid, string projectName)
+        {
+            var p = solutionFile.ProjectsByGuid[guid];
+            if (p.ParentProjectGuid == null)
+                return p.ProjectName + projectName;
+            else
+                return GetPathForProject(p.ParentProjectGuid, p.ProjectName + projectName);
+        }
+
+        private void BuildTree(IEnumerable<ProjectInSolution> projectsInSolution, ISolutionProject parentComposite)
         {
             foreach (var projectChild in projectsInSolution)
             {
                 if (projectChild.ProjectType == SolutionProjectType.SolutionFolder)
                 {
-                    var currentComposite = new Composite(projectChild.ProjectName);
+                    var currentComposite = new SolutionFolder(projectChild.ProjectName);
                     parentComposite.Add(currentComposite);
 
                     BuildTree(GetProjectsInSolution(projectChild.ProjectGuid), currentComposite);
                 }
                 else
                 {
-                    var leaf = new Leaf(projectChild.ProjectName);
+                    var leaf = new SolutionProject(projectChild.ProjectName);
                     parentComposite.Add(leaf);
                     AddProjectDependecies(leaf, projectChild);
                 }
@@ -66,27 +73,14 @@ namespace ProjectDependecy.ConsoleApp
             return solutionFile.ProjectsInOrder.Where(project => project.ParentProjectGuid == parentGuid);
         }
 
-        private void BuildProjectDependencies()
-        {
-            foreach (var item in projectStructureService.GetStrucutre())
-            {
-                generatorService.BuildProject(item.Key);
-
-                foreach (var dep in item.Value)
-                {
-                    generatorService.BuildDependency(item.Key, dep);
-                }
-            }
-        }
-
-        private void AddProjectDependecies(Leaf leaf, ProjectInSolution project)
+        private void AddProjectDependecies(SolutionProject leaf, ProjectInSolution project)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(project.AbsolutePath);
 
             foreach (XmlElement projectReference in xmlDoc.GetElementsByTagName("ProjectReference"))
             {
-                leaf.AddDependency(Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include")));
+                leaf.Dependencies.Add(Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include")));
             }
         }
     }

@@ -1,12 +1,16 @@
 # Project Dependency
 Project dependency diagram builder. Generate JSON from your solution and also XML for [draw.io](https://app.diagrams.net/).
 
-This is just for my personal purposes and it's very simple. Tested only on a few basic solutions. I use this tool for diagrams of my solutions when I learning.
+This is just for my personal purposes and it's very simple. Still in development. 
+
+Tested only on a few basic solutions. I use this tool for diagrams of my solutions when I learning.
 
 ## Functionality
 - [x] Export XML ready diagram for importing to [draw.io](https://app.diagrams.net/)
 - [x] Export JSON with dependencies between projects
 - [x] .NET Core applications only
+- [x] Support for solution folders in JSON
+- [ ] Solution folder in chart
 
 ## Example of outputs
 ### Final diagram

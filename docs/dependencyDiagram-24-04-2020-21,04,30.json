@@ -1,0 +1,25 @@
+{
+  "Core": [],
+  "UI": {
+    "TestSolution.ConsoleApp": [
+      "DataAccess.Sql",
+      "DataAccess.Txt"
+    ],
+    "TestSolution.WebApp": []
+  },
+  "DataAccess": {
+    "DataAccessCommon": [
+      "Core",
+      "DataAccess.Base"
+    ],
+    "DataAccess.Sql": [
+      "DataAccessCommon"
+    ],
+    "DataAccess.Txt": [
+      "DataAccessCommon"
+    ],
+    "Base": {
+      "DataAccess.Base": []
+    }
+  }
+}

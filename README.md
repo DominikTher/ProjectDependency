@@ -19,7 +19,7 @@ Tested only on a few basic solutions. I use this tool for diagrams of my solutio
 ### XML file
 [dependencyDiagram-20-04-2020-20,19,52.xml](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.xml)
 ### JSON file
-[dependencyDiagram-20-04-2020-20,19,52.json](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.json)
+[dependencyDiagram-20-04-2020-20,19,52.json](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-24-04-2020-21,04,30.json)
 
 ## Usage
 1. As an argument for the console app, paste the path of the concrete solution

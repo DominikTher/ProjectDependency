@@ -2,6 +2,6 @@
 {
     interface IHtmlChartService
     {
-        void Save(string jsonString);
+        void Save(string jsonString, string solutionName);
     }
 }

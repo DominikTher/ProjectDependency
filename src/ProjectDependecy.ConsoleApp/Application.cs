@@ -2,6 +2,7 @@
 using ProjectDependecy.ConsoleApp.Composite;
 using ProjectDependecy.ConsoleApp.Services;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ProjectDependecy.ConsoleApp
 {
@@ -29,7 +30,7 @@ namespace ProjectDependecy.ConsoleApp
             var jsonString = jsonService.GetJsonString(root);
             jsonService.Save(jsonString);
 
-            htmlChartService.Save(jsonString);
+            htmlChartService.Save(jsonString, Path.GetFileNameWithoutExtension(solutionFilePtah));
         }
     }
 }

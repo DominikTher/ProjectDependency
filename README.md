@@ -10,12 +10,12 @@ This is just for my personal purposes and it's very simple. Tested only on a few
 
 ## Example of outputs
 ### Final diagram
-![Dependency diagram](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.png)
+![Dependency diagram](https://github.com/DominikTher/ProjectDependency/blob/basic/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.png)
 
 ### XML file
-[dependencyDiagram-20-04-2020-20,19,52.xml](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.xml)
+[dependencyDiagram-20-04-2020-20,19,52.xml](https://github.com/DominikTher/ProjectDependency/blob/basic/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.xml)
 ### JSON file
-[dependencyDiagram-20-04-2020-20,19,52.json](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.json)
+[dependencyDiagram-20-04-2020-20,19,52.json](https://github.com/DominikTher/ProjectDependency/blob/basic/docs/dependencyDiagram-20-04-2020-20%2C19%2C52.json)
 
 ## Usage
 1. As an argument for the console app, paste the path of the concrete solution

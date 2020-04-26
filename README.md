@@ -11,6 +11,7 @@ Tested only on a few basic solutions. I use this tool for diagrams of my solutio
 - [x] Support for solution folders in HTML
 - [x] Support for solution folders in JSON
 - [X] .NET Core applications only
+- [X] Colors in HTML diagram are generated randomly with each refresh (custom JS function)
 
 ## Example of outputs
 
@@ -18,7 +19,7 @@ Tested only on a few basic solutions. I use this tool for diagrams of my solutio
 ![Dependency diagram](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-26-04-2020-12,20,45.PNG)
 
 ### HTML file
-![dependencyDiagram-26-04-2020-12,20,45.html](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-26-04-2020-12,20,45.html)
+[dependencyDiagram-26-04-2020-12,20,45.html](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-26-04-2020-12,20,45.html)
 
 ### JSON file
 [dependencyDiagram-26-04-2020-12,20,45.json](https://github.com/DominikTher/ProjectDependency/blob/master/docs/dependencyDiagram-26-04-2020-12,20,45.json)
@@ -27,4 +28,5 @@ Tested only on a few basic solutions. I use this tool for diagrams of my solutio
 1. Argument for the console app is path of the concrete solution
 2. Then JSON and HTML files will be created automatically in the output directory
 3. That's it, check your HTML chart :)
+	- Refresh page for different colors
 4. If you are not satisfied with the result, use JSON for further processing :)

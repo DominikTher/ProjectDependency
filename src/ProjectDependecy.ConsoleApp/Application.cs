@@ -1,98 +1,35 @@
 ﻿using Microsoft.Build.Construction;
 using ProjectDependecy.ConsoleApp.Composite;
 using ProjectDependecy.ConsoleApp.Services;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Xml;
 
 namespace ProjectDependecy.ConsoleApp
 {
     class Application
     {
-        private readonly IProjectStructureService projectStructureService;
-        private readonly IGeneratorService generatorService;
         private IEnumerable<ProjectInSolution> rootProjects;
-        private SolutionFile solutionFile;
+        private readonly IJsonService jsonService;
+        private readonly ISolutionProjectClient solutionProjectClient;
+        private readonly IHtmlChartService htmlChartService;
 
-        public Application(IProjectStructureService projectStructureService, IGeneratorService generatorService)
+        public Application(IJsonService jsonService, ISolutionProjectClient solutionProjectClient, IHtmlChartService htmlChartService)
         {
-            this.projectStructureService = projectStructureService;
-            this.generatorService = generatorService;
+            this.jsonService = jsonService;
+            this.solutionProjectClient = solutionProjectClient;
+            this.htmlChartService = htmlChartService;
         }
 
         public void Start(string solutionFilePtah)
         {
-            solutionFile = SolutionFile.Parse(solutionFilePtah);
-
-            // Demo
-            var projectPath = GetPathForProject("{018DF148-8688-4384-8177-A214562C52B9}", string.Empty);
-
+            solutionProjectClient.SetSolutionFile(solutionFilePtah);
             var root = new SolutionFolder();
-            rootProjects = GetProjectsInSolution(null);
-            BuildTree(rootProjects, root);
+            rootProjects = solutionProjectClient.GetProjectsInSolution(null);
+            solutionProjectClient.BuildTree(rootProjects, root);
 
-            // Demo
-            var jsonSerializerOptions = new JsonSerializerOptions();
-            jsonSerializerOptions.WriteIndented = true;
-            jsonSerializerOptions.Converters.Add(new SolutionProjectCompositeConverter());
-            var jsonString = JsonSerializer.Serialize(root, jsonSerializerOptions);
-            File.WriteAllText($"dependencyDiagram-{DateTime.Now:dd-MM-yyyy-HH,mm,ss}.json", jsonString);
+            var jsonString = jsonService.GetJsonString(root);
+            jsonService.Save(jsonString);
 
-            // TODO refactor
-            generatorService.Save(projectStructureService.GetStrucutre());
-
-            // TODO separate xml generator + separate json generator
-        }
-
-        private string GetPathForProject(string guid, string projectName)
-        {
-            var p = solutionFile.ProjectsByGuid[guid];
-            if (p.ParentProjectGuid == null)
-                return p.ProjectName + projectName;
-            else
-                return GetPathForProject(p.ParentProjectGuid, p.ProjectName + projectName);
-        }
-
-        private void BuildTree(IEnumerable<ProjectInSolution> projectsInSolution, ISolutionProject parentComposite)
-        {
-            foreach (var projectChild in projectsInSolution)
-            {
-                if (projectChild.ProjectType == SolutionProjectType.SolutionFolder)
-                {
-                    var currentComposite = new SolutionFolder(projectChild.ProjectName);
-                    parentComposite.Add(currentComposite);
-
-                    BuildTree(GetProjectsInSolution(projectChild.ProjectGuid), currentComposite);
-                }
-                else
-                {
-                    var leaf = new SolutionProject(projectChild.ProjectName);  
-                    parentComposite.Add(leaf);
-                    projectStructureService.AddProject(leaf.Name);
-                    AddProjectDependecies(leaf, projectChild);
-                }
-            }
-        }
-
-        private IEnumerable<ProjectInSolution> GetProjectsInSolution(string parentGuid)
-        {
-            return solutionFile.ProjectsInOrder.Where(project => project.ParentProjectGuid == parentGuid);
-        }
-
-        private void AddProjectDependecies(SolutionProject leaf, ProjectInSolution project)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(project.AbsolutePath);
-
-            foreach (XmlElement projectReference in xmlDoc.GetElementsByTagName("ProjectReference"))
-            {
-                var dependency = Path.GetFileNameWithoutExtension(projectReference.GetAttribute("Include"));
-                leaf.Dependencies.Add(dependency);
-                projectStructureService.AddDependency(leaf.Name, dependency);
-            }
+            htmlChartService.Save(jsonString);
         }
     }
 }

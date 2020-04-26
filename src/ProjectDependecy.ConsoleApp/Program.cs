@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ProjectDependecy.ConsoleApp.Composite;
 using ProjectDependecy.ConsoleApp.Services;
 
 namespace ProjectDependecy.ConsoleApp
@@ -10,15 +11,16 @@ namespace ProjectDependecy.ConsoleApp
             using var serviceProvider = BuilServiceProvider();
             var application = serviceProvider.GetRequiredService<Application>();
 
-            var solutionFilePath = @"D:\source\repos\TestSolution\TestSolution.sln";// args[0];
+            var solutionFilePath = args[0];
             application.Start(solutionFilePath);
         }
 
         private static ServiceProvider BuilServiceProvider()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IProjectStructureService, ProjectStructureService>();
-            serviceCollection.AddSingleton<IGeneratorService, GeneratorService>();
+            serviceCollection.AddSingleton<IJsonService, JsonService>();
+            serviceCollection.AddSingleton<IHtmlChartService, HtmlChartService>();
+            serviceCollection.AddSingleton<ISolutionProjectClient, SolutionProjectClient>();
             serviceCollection.AddSingleton<Application>();
 
             return serviceCollection.BuildServiceProvider();
